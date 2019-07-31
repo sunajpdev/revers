@@ -1,12 +1,28 @@
 version: "3"
 services:
-  app:
+  nginx:
     image: nginx:latest
-    container_name: "app"
-    ports:
-      - "8080:80"
+    container_name: 'nginx'
+    privileged: true
     volumes:
-      - ./nginx/html:/app
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+  
+  app1:
+    image: nginx:latest
+    container_name: "app1"
+    volumes:
+      - ./app1/html:/app
+      - ./app1/default.conf:/etc/nginx/conf.d/default.conf
+    environment:
+      VIRTUAL_HOST: 'app1.test'
+      LETSENCRYPT_HOST: 'app1.test'
+      LETSENCRYPT_EMAIL: 'example@app1.test'
 
-
+networks:
+  default:
+    external:
+      name: shared
